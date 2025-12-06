@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IROLINKS</title>
+    <style>
+        *{margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif}
+        body{background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);min-height:100vh;display:flex;justify-content:center;align-items:center;padding:20px}
+        .container{background:white;border-radius:20px;box-shadow:0 20px 60px rgba(0,0,0,0.3);width:100%;max-width:450px;padding:40px;position:relative;overflow:hidden}
+        .header{text-align:center;margin-bottom:30px}
+        .logo{font-size:2.5rem;font-weight:800;background:linear-gradient(45deg,#667eea,#764ba2);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:10px}
+        .tagline{color:#666;font-size:0.9rem;margin-bottom:30px}
+        .form-container{display:flex;flex-direction:column;gap:20px}
+        .form{display:none}
+        .form.active{display:block}
+        .form h2{color:#333;margin-bottom:20px;text-align:center}
+        .input-group{margin-bottom:20px}
+        input{width:100%;padding:15px;border:2px solid #e0e0e0;border-radius:10px;font-size:16px;transition:border-color 0.3s}
+        input:focus{outline:none;border-color:#667eea}
+        button{width:100%;padding:15px;background:linear-gradient(45deg,#667eea,#764ba2);color:white;border:none;border-radius:10px;font-size:16px;font-weight:600;cursor:pointer;transition:transform 0.3s,box-shadow 0.3s}
+        button:hover{transform:translateY(-2px);box-shadow:0 10px 20px rgba(102,126,234,0.3)}
+        button:active{transform:translateY(0)}
+        .toggle-form{text-align:center;margin-top:20px;color:#666}
+        .toggle-btn{background:none;border:none;color:#667eea;cursor:pointer;font-weight:600;padding:5px;width:auto}
+        .toggle-btn:hover{text-decoration:underline;transform:none;box-shadow:none}
+        .message{padding:10px;border-radius:5px;margin:10px 0;text-align:center;display:none}
+        .success{background-color:#d4edda;color:#155724;border:1px solid #c3e6cb}
+        .error{background-color:#f8d7da;color:#721c24;border:1px solid #f5c6cb}
+        .dashboard{display:none}
+        .url-form input{margin-bottom:10px}
+        .short-url-container{margin-top:20px;padding:15px;background:#f8f9fa;border-radius:10px;display:none}
+        .short-url{color:#667eea;font-weight:600;word-break:break-all}
+        .copy-btn{background:#28a745;margin-top:10px}
+        .logout-btn{background:#dc3545;margin-top:20px}
+        .github-btn{background:#333;margin-top:10px}
+        .github-btn:hover{background:#24292e}
+        .stats{display:flex;justify-content:space-between;margin-top:20px;color:#666;font-size:0.9rem}
+        .user-links{margin-top:20px;max-height:200px;overflow-y:auto;border:1px solid #e0e0e0;border-radius:10px;padding:10px}
+        .user-links h4{color:#333;margin-bottom:10px;text-align:center}
+        .link-item{display:flex;justify-content:space-between;align-items:center;padding:8px;border-bottom:1px solid #f0f0f0}
+        .link-item:last-child{border-bottom:none}
+        .link-short{color:#667eea;font-size:0.9rem}
+        .link-clicks{color:#666;font-size:0.8rem}
+        .session-info{position:absolute;top:15px;right:15px;background:#f8f9fa;padding:5px 10px;border-radius:20px;font-size:0.8rem;color:#666;display:none}
+        .session-expiry{color:#dc3545;font-weight:bold}
+        .footer{text-align:center;margin-top:30px;color:#666;font-size:0.8rem}
+        .footer a{color:#667eea;text-decoration:none}
+        .loading{display:none;text-align:center;margin:20px 0}
+        .spinner{border:3px solid #f3f3f3;border-top:3px solid #667eea;border-radius:50%;width:30px;height:30px;animation:spin 1s linear infinite;margin:0 auto 10px}
+        @keyframes spin{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="session-info" id="sessionInfo">
+            Session: <span id="sessionTimer">--:--</span>
+        </div>
+        
+        <div class="header">
+            <div class="logo">IROLINKS</div>
+            <div class="tagline">Shorten URLs instantly with our free service</div>
+        </div>
+
+        <div class="form-container">
+            <div id="loginForm" class="form active">
+                <h2>Login</h2>
+                <div class="input-group">
+                    <input type="text" id="loginId" placeholder="Username" required>
+                </div>
+                <div class="input-group">
+                    <input type="password" id="loginPassword" placeholder="Password" required>
+                </div>
+                <div class="input-group">
+                    <label style="display:block;margin-bottom:5px;color:#666">
+                        <input type="checkbox" id="rememberMe" style="width:auto;margin-right:5px">
+                        Remember me (7 days)
+                    </label>
+                </div>
+                <button onclick="login()">Login</button>
+                <div class="toggle-form">
+                    Don't have an account? <button class="toggle-btn" onclick="showSignup()">Sign Up</button>
+                </div>
+            </div>
+
+            <div id="signupForm" class="form">
+                <h2>Sign Up</h2>
+                <div class="input-group">
+                    <input type="text" id="signupId" placeholder="Choose Username" required>
+                </div>
+                <div class="input-group">
+                    <input type="password" id="signupPassword" placeholder="Choose Password" required>
+                </div>
+                <div class="input-group">
+                    <input type="password" id="confirmPassword" placeholder="Confirm Password" required>
+                </div>
+                <button onclick="signup()">Create Account</button>
+                <div class="toggle-form">
+                    Already have an account? <button class="toggle-btn" onclick="showLogin()">Login</button>
+                </div>
+            </div>
+
+            <div id="dashboard" class="dashboard">
+                <h2>Welcome, <span id="username"></span>!</h2>
+                <div class="url-form">
+                    <input type="url" id="longUrl" placeholder="Enter long URL (https://example.com)" required>
+                    <button onclick="shortenUrl()">Shorten URL</button>
+                </div>
+                <div class="loading" id="shortenLoading">
+                    <div class="spinner"></div>
+                    Shortening URL...
+                </div>
+                <div class="short-url-container" id="shortUrlContainer">
+                    <p>Short URL:</p>
+                    <a href="#" target="_blank" class="short-url" id="shortUrl"></a>
+                    <button class="copy-btn" onclick="copyShortUrl()">Copy URL</button>
+                </div>
+                
+                <div class="user-links" id="userLinks">
+                    <h4>Your Recent Links</h4>
+                    <div id="linksList"></div>
+                </div>
+                
+                <div class="stats">
+                    <span>Made by: Deepseek & IRONMAN</span>
+                    <span id="linkCount">Links: 0</span>
+                </div>
+                <button class="github-btn" onclick="window.open('https://github.com/IROTECHLAB/irolinks','_blank')">
+                    <span style="display:inline-flex;align-items:center;gap:8px">
+                        <svg height="20" viewBox="0 0 16 16" width="20" fill="white">
+                            <path fill-rule="evenodd" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"></path>
+                        </svg>
+                        View on GitHub
+                    </span>
+                </button>
+                <button class="logout-btn" onclick="logout()">Logout</button>
+            </div>
+
+            <div id="message" class="message"></div>
+        </div>
+
+        <div class="footer">
+            <p>Open Source Code | <a href="https://t.me/ironmanhindigaming" target="_blank">Telegram</a></p>
+        </div>
+    </div>
+
+    <script>
+        let currentUser=null
+        let sessionToken=null
+        let sessionTimer=null
+        let sessionExpiry=null
+
+        function setSession(token,userId,expiryMinutes=60){
+            sessionToken=token
+            currentUser=userId
+            sessionExpiry=new Date(Date.now()+expiryMinutes*60000)
+            
+            localStorage.setItem('irolinks_session_token',token)
+            localStorage.setItem('irolinks_user_id',userId)
+            localStorage.setItem('irolinks_session_expiry',sessionExpiry.getTime())
+            
+            updateSessionTimer()
+        }
+
+        function clearSession(){
+            sessionToken=null
+            currentUser=null
+            sessionExpiry=null
+            
+            localStorage.removeItem('irolinks_session_token')
+            localStorage.removeItem('irolinks_user_id')
+            localStorage.removeItem('irolinks_session_expiry')
+            
+            if(sessionTimer){clearInterval(sessionTimer)}
+            
+            document.getElementById('sessionInfo').style.display='none'
+        }
+
+        function checkSession(){
+            const token=localStorage.getItem('irolinks_session_token')
+            const userId=localStorage.getItem('irolinks_user_id')
+            const expiry=localStorage.getItem('irolinks_session_expiry')
+            
+            if(token&&userId&&expiry){
+                const expiryTime=parseInt(expiry)
+                if(Date.now()<expiryTime){
+                    validateSession(token,userId)
+                }else{
+                    clearSession()
+                }
+            }
+        }
+
+        async function validateSession(token,userId){
+            try{
+                const response=await fetch('/.netlify/functions/link',{
+                    method:'POST',
+                    headers:{'Content-Type':'application/json'},
+                    body:JSON.stringify({
+                        action:'validate_session',
+                        token:token,
+                        userId:userId
+                    })
+                })
+
+                const data=await response.json()
+                
+                if(data.success){
+                    setSession(token,userId,data.expiryMinutes)
+                    loadUserLinks()
+                }else{
+                    clearSession()
+                }
+            }catch(error){
+                console.error('Session validation error:',error)
+                clearSession()
+            }
+        }
+
+        function updateSessionTimer(){
+            const sessionInfo=document.getElementById('sessionInfo')
+            const timerElement=document.getElementById('sessionTimer')
+            
+            sessionInfo.style.display='block'
+            
+            if(sessionTimer){clearInterval(sessionTimer)}
+            
+            sessionTimer=setInterval(()=>{
+                if(!sessionExpiry)return
+                
+                const now=new Date()
+                const diff=sessionExpiry-now
+                
+                if(diff<=0){
+                    clearInterval(sessionTimer)
+                    clearSession()
+                    showMessage('Session expired. Please login again.','error')
+                    logout()
+                    return
+                }
+                
+                const minutes=Math.floor(diff/60000)
+                const seconds=Math.floor((diff%60000)/1000)
+                
+                timerElement.textContent=`${minutes}:${seconds.toString().padStart(2,'0')}`
+                
+                if(minutes<5){
+                    timerElement.className='session-expiry'
+                }else{
+                    timerElement.className=''
+                }
+            },1000)
+        }
+
+        function showMessage(text,type){
+            const messageDiv=document.getElementById('message')
+            messageDiv.textContent=text
+            messageDiv.className=`message ${type}`
+            messageDiv.style.display='block'
+            
+            setTimeout(()=>{
+                messageDiv.style.display='none'
+            },5000)
+        }
+
+        function showSignup(){
+            document.getElementById('loginForm').classList.remove('active')
+            document.getElementById('signupForm').classList.add('active')
+        }
+
+        function showLogin(){
+            document.getElementById('signupForm').classList.remove('active')
+            document.getElementById('loginForm').classList.add('active')
+        }
+
+        async function signup(){
+            const id=document.getElementById('signupId').value
+            const password=document.getElementById('signupPassword').value
+            const confirmPassword=document.getElementById('confirmPassword').value
+
+            if(!id||!password){
+                showMessage('Please fill all fields','error')
+                return
+            }
+
+            if(password!==confirmPassword){
+                showMessage('Passwords do not match','error')
+                return
+            }
+
+            try{
+                const response=await fetch('/.netlify/functions/link',{
+                    method:'POST',
+                    headers:{'Content-Type':'application/json'},
+                    body:JSON.stringify({
+                        action:'signup',
+                        id:id,
+                        password:password
+                    })
+                })
+
+                const data=await response.json()
+                
+                if(data.success){
+                    showMessage('Account created successfully! Please login.','success')
+                    showLogin()
+                    document.getElementById('signupId').value=''
+                    document.getElementById('signupPassword').value=''
+                    document.getElementById('confirmPassword').value=''
+                }else{
+                    showMessage(data.message||'Signup failed','error')
+                }
+            }catch(error){
+                showMessage('Network error. Please try again.','error')
+            }
+        }
+
+        async function login(){
+            const id=document.getElementById('loginId').value
+            const password=document.getElementById('loginPassword').value
+            const rememberMe=document.getElementById('rememberMe').checked
+
+            if(!id||!password){
+                showMessage('Please fill all fields','error')
+                return
+            }
+
+            try{
+                const response=await fetch('/.netlify/functions/link',{
+                    method:'POST',
+                    headers:{'Content-Type':'application/json'},
+                    body:JSON.stringify({
+                        action:'login',
+                        id:id,
+                        password:password,
+                        rememberMe:rememberMe
+                    })
+                })
+
+                const data=await response.json()
+                
+                if(data.success){
+                    setSession(data.token,id,data.expiryMinutes)
+                    showDashboard(data)
+                    loadUserLinks()
+                }else{
+                    showMessage(data.message||'Login failed','error')
+                }
+            }catch(error){
+                showMessage('Network error. Please try again.','error')
+            }
+        }
+
+        function showDashboard(data){
+            document.getElementById('loginForm').style.display='none'
+            document.getElementById('signupForm').style.display='none'
+            document.getElementById('dashboard').style.display='block'
+            document.getElementById('username').textContent=currentUser
+            document.getElementById('linkCount').textContent=`Links: ${data.links||0}`
+            
+            document.getElementById('loginId').value=''
+            document.getElementById('loginPassword').value=''
+        }
+
+        async function loadUserLinks(){
+            try{
+                const response=await fetch('/.netlify/functions/link',{
+                    method:'POST',
+                    headers:{'Content-Type':'application/json'},
+                    body:JSON.stringify({
+                        action:'get_user_links',
+                        token:sessionToken,
+                        userId:currentUser
+                    })
+                })
+
+                const data=await response.json()
+                
+                if(data.success&&data.links){
+                    const linksList=document.getElementById('linksList')
+                    linksList.innerHTML=''
+                    
+                    if(data.links.length===0){
+                        linksList.innerHTML='<p style="text-align:center;color:#666">No links created yet</p>'
+                        return
+                    }
+                    
+                    data.links.slice(0,5).forEach(link=>{
+                        const linkElement=document.createElement('div')
+                        linkElement.className='link-item'
+                        linkElement.innerHTML=`
+                            <div>
+                                <div class="link-short">${window.location.origin}/link?id=${link.shortId}</div>
+                                <div style="font-size:0.8rem;color:#999;max-width:200px;overflow:hidden;text-overflow:ellipsis">
+                                    ${link.longUrl}
+                                </div>
+                            </div>
+                            <div class="link-clicks">${link.clicks} clicks</div>
+                        `
+                        linksList.appendChild(linkElement)
+                    })
+                }
+            }catch(error){
+                console.error('Error loading user links:',error)
+            }
+        }
+
+        async function shortenUrl(){
+            const longUrl=document.getElementById('longUrl').value
+            
+            if(!longUrl){
+                showMessage('Please enter a URL','error')
+                return
+            }
+
+            try{
+                new URL(longUrl)
+            }catch{
+                showMessage('Please enter a valid URL (include http:// or https://)','error')
+                return
+            }
+
+            document.getElementById('shortenLoading').style.display='block'
+
+            try{
+                const response=await fetch('/.netlify/functions/link',{
+                    method:'POST',
+                    headers:{'Content-Type':'application/json'},
+                    body:JSON.stringify({
+                        action:'shorten',
+                        token:sessionToken,
+                        userId:currentUser,
+                        longUrl:longUrl
+                    })
+                })
+
+                const data=await response.json()
+                
+                if(data.success){
+                    const shortUrl=`${window.location.origin}/link?id=${data.shortId}`
+                    document.getElementById('shortUrl').textContent=shortUrl
+                    document.getElementById('shortUrl').href=shortUrl
+                    document.getElementById('shortUrlContainer').style.display='block'
+                    
+                    document.getElementById('linkCount').textContent=`Links: ${data.totalLinks}`
+                    
+                    loadUserLinks()
+                    
+                    showMessage('URL shortened successfully!','success')
+                }else{
+                    showMessage(data.message||'Failed to shorten URL','error')
+                }
+            }catch(error){
+                showMessage('Network error. Please try again.','error')
+            }finally{
+                document.getElementById('shortenLoading').style.display='none'
+            }
+        }
+
+        function copyShortUrl(){
+            const shortUrl=document.getElementById('shortUrl').textContent
+            navigator.clipboard.writeText(shortUrl)
+                .then(()=>showMessage('URL copied to clipboard!','success'))
+                .catch(()=>showMessage('Failed to copy URL','error'))
+        }
+
+        function logout(){
+            if(sessionToken){
+                fetch('/.netlify/functions/link',{
+                    method:'POST',
+                    headers:{'Content-Type':'application/json'},
+                    body:JSON.stringify({
+                        action:'logout',
+                        token:sessionToken
+                    })
+                })
+            }
+            
+            clearSession()
+            
+            document.getElementById('dashboard').style.display='none'
+            document.getElementById('loginForm').style.display='block'
+            document.getElementById('loginForm').classList.add('active')
+            document.getElementById('signupForm').classList.remove('active')
+            document.getElementById('signupForm').style.display='none'
+            document.getElementById('longUrl').value=''
+            document.getElementById('shortUrlContainer').style.display='none'
+            document.getElementById('linksList').innerHTML=''
+            
+            showMessage('Logged out successfully','success')
+        }
+
+        window.onload=function(){
+            checkSession()
+        }
+
+        window.addEventListener('beforeunload',function(){
+            if(sessionToken){
+                const rememberMe=localStorage.getItem('irolinks_remember_me')
+                if(!rememberMe){
+                    clearSession()
+                }
+            }
+        })
+    </script>
+</body>
+</html>
