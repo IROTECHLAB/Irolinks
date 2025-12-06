@@ -14,7 +14,7 @@ A powerful, session-based URL shortener service built with Netlify Functions. Fe
 
 - **🔗 URL Shortening**: Convert long URLs to short, memorable links
 - **🔐 Session-Based Auth**: Secure user authentication with token management
-- **⏱️ 10-Second Countdown**: Mandatory wait before redirect (no skip option)
+- **⏱️ 10-Second Countdown**: Mandatory wait before redirect
 - **📊 Click Tracking**: Monitor link performance and analytics
 - **👤 User Dashboard**: View and manage your shortened links
 - **💾 JSON Database**: No external database required
