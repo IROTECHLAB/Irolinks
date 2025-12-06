@@ -51,10 +51,9 @@ Irolinks/
 ```bash
 # Clone the repository
 git clone https://github.com/IROTECHLAB/irolinks.git
-cd irolinks```
+cd irolinks
 
 # Deploy to Netlify
-```bash
 netlify deploy
 ```
 
@@ -107,6 +106,7 @@ FIREBASE_AUTH_DOMAIN = your-auth-domain
 · Firefox 55+
 · Safari 11+
 · Edge 79+
+· Via Browser
 · Mobile browsers
 
 🤝 Contributing
@@ -123,7 +123,7 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 
 📞 Contact & Support
 
-· Demo: irolinks.netlify.app
+· Demo: https://irolinks.netlify.app
 · Contact: https://t.me/ironmanhindigaming
 · Support: https://t.me/ironmanhindigming1
 · Updates: https://t.me/irotechlab
