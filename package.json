@@ -1,0 +1,24 @@
+{
+  "name": "irolinks",
+  "version": "1.0.0",
+  "description": "URL Shortener Service",
+  "main": "index.html",
+  "scripts": {
+    "build": "echo 'Building IROLINKS...'",
+    "start": "echo 'Start IROLINKS locally'"
+  },
+  "dependencies": {
+    "firebase-admin": "^11.0.0"
+  },
+  "engines": {
+    "node": ">=14.0.0"
+  },
+  "keywords": [
+    "url-shortener",
+    "netlify",
+    "firebase",
+    "session"
+  ],
+  "author": "Deepseek & IRONMAN",
+  "license": "MIT"
+}
