@@ -1,0 +1,19 @@
+[build]
+  publish = "."
+  command = "npm install"
+
+[[redirects]]
+  from = "/link"
+  to = "/.netlify/functions/link"
+  status = 200
+
+[[redirects]]
+  from = "/link/*"
+  to = "/.netlify/functions/link"
+  status = 200
+
+[functions]
+  directory = "netlify/functions"
+
+[functions.node_bundle]
+  external_node_modules = []
